@@ -1,30 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import dynamic from "next/dynamic"
-import { HeroSection } from "@/components/hero-section"
-import { InfoSection } from "@/components/info-section"
-import type { FormData } from "@/components/form-modal"
-import { CameraModal } from "@/components/camera-modal"
-import { ScanLoader } from "@/components/scan-loader"
-
-const ResultsView = dynamic(
-  () => import("@/components/results-view").then((m) => m.ResultsView),
-  { ssr: false }
-)
+import { SkinHeroSection } from "@/components/skin/hero-section"
+import { SkinInfoSection } from "@/components/skin/info-section"
+import { SkinCameraModal } from "@/components/skin/camera-modal"
+import { SkinScanLoader } from "@/components/skin/scan-loader"
+import { SkinResultsView } from "@/components/skin/results-view"
+import type { SkinFormData } from "@/components/skin/skin-types"
 
 type AppState = "landing" | "camera" | "scanning" | "results"
 
-export default function Home() {
+export default function SkinPage() {
   const [appState, setAppState] = useState<AppState>("landing")
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SkinFormData>({
     name: "",
     phone: "",
     problem: "",
   })
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
 
-  const handleStartScanFromHero = (data: FormData) => {
+  const handleStartScanFromHero = (data: SkinFormData) => {
     setFormData(data)
     setAppState("camera")
   }
@@ -49,21 +44,21 @@ export default function Home() {
   }
 
   if (appState === "results") {
-    return <ResultsView formData={formData} capturedImage={capturedImage} onBack={handleBackToHome} />
+    return <SkinResultsView formData={formData} capturedImage={capturedImage} onBack={handleBackToHome} />
   }
 
   return (
     <main className="min-h-screen bg-background">
-      <HeroSection onStartScan={handleStartScanFromHero} />
-      <InfoSection onStartScan={handleStartScan} />
+      <SkinHeroSection onStartScan={handleStartScanFromHero} />
+      <SkinInfoSection onStartScan={handleStartScan} />
 
-      <CameraModal
+      <SkinCameraModal
         open={appState === "camera"}
         onOpenChange={(open) => !open && setAppState("landing")}
         onCapture={handleCapture}
       />
 
-      <ScanLoader
+      <SkinScanLoader
         open={appState === "scanning"}
         onOpenChange={() => {}}
         capturedImage={capturedImage}
