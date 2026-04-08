@@ -38,8 +38,8 @@ export function SkinInfoSection({ onStartScan: _onStartScan }: SkinInfoSectionPr
           .info-grid-4 { grid-template-columns: 1fr 1fr; gap: 12px; }
           .info-cta-btns { flex-direction: column; align-items: stretch; }
           .info-cta-btn { justify-content: center; }
-          .info-side-images { grid-template-columns: 1fr; gap: 12px; max-width: 280px; }
-          .info-side-image { height: 220px; }
+          .info-side-images { grid-template-columns: 1fr; gap: 12px; max-width: 340px; }
+          .info-side-image { height: 340px; }
         }
       `}</style>
 

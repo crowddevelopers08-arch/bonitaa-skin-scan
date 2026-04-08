@@ -39,47 +39,47 @@ export function SkinHeroSection({ onStartScan }: SkinHeroSectionProps) {
   }
 
   return (
-    <section className="relative flex max-sm:py-5 md:py-15 flex-col items-center justify-center overflow-hidden bg-background px-4">
+    <section className="relative flex flex-col items-center justify-center overflow-hidden bg-background px-4 py-8 sm:px-6 sm:py-12 md:py-15">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(221,185,90,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(221,185,90,0.06)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(221,185,90,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(221,185,90,0.06)_1px,transparent_1px)] bg-[size:40px_40px] sm:bg-[size:60px_60px]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(221,185,90,0.12),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(221,185,90,0.08),transparent_30%)]" />
         <div className="absolute inset-x-0 top-0 h-[55%] bg-[linear-gradient(180deg,rgba(221,185,90,0.1),transparent)]" />
         <div className="absolute left-0 top-1/3 h-40 w-full" />
-        <div className="absolute left-1/2 top-[42%] h-[680px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute left-1/2 top-24 h-64 w-[32rem] -translate-x-1/2 rounded-full bg-primary/12 blur-[90px]" />
-        <div className="animate-float absolute left-1/4 top-1/4 h-32 w-32 rounded-full bg-primary/14" />
-        <div className="animate-float-delayed absolute bottom-1/4 right-1/4 h-40 w-40 rounded-full bg-primary/14 " />
+        <div className="absolute left-1/2 top-[42%] h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[90px] sm:h-[680px] sm:w-[680px] sm:blur-[120px]" />
+        <div className="absolute left-1/2 top-20 h-40 w-[18rem] -translate-x-1/2 rounded-full bg-primary/12 blur-[70px] sm:top-24 sm:h-64 sm:w-[32rem] sm:blur-[90px]" />
+        <div className="animate-float absolute left-[8%] top-[18%] h-20 w-20 rounded-full bg-primary/14 sm:left-1/4 sm:top-1/4 sm:h-32 sm:w-32" />
+        <div className="animate-float-delayed absolute bottom-[18%] right-[8%] h-24 w-24 rounded-full bg-primary/14 sm:bottom-1/4 sm:right-1/4 sm:h-40 sm:w-40" />
       </div>
 
       <div className="relative z-10 flex max-w-3xl flex-col items-center text-center">
-        <div className="mb-8 max-sm:mb-4 relative">
+        <div className="relative mb-5 sm:mb-8">
           <div className="absolute inset-0 rounded-2xl bg-primary/10 blur-xl" />
-          <div className="relative rounded-2xl border border-primary/20 bg-[#080b12]/80 px-6 py-3 backdrop-blur-sm shadow-[0_0_30px_rgba(221,185,90,0.12)]">
-            <img src="/logo-1.png" alt="Bonitaa HQ" className="h-20 w-auto object-contain md:h-25" />
+          <div className="relative rounded-2xl border border-primary/20 bg-[#080b12]/80 px-4 py-2.5 shadow-[0_0_30px_rgba(221,185,90,0.12)] backdrop-blur-sm sm:px-6 sm:py-3">
+            <img src="/logo-1.png" alt="Bonitaa HQ" className="h-14 w-auto object-contain sm:h-20 md:h-25" />
           </div>
         </div>
 
-        <div className="mb-6 max-sm:mb-2 flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary">
-          <Sparkles className="h-4 w-4" />
+        <div className="mb-3 flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
+          <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           <span>Advanced Skin Analysis</span>
         </div>
 
-        <h1 className="mb-6 max-sm:mb-2 text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+        <h1 className="mb-3 max-w-[16ch] text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:mb-6 sm:max-w-none sm:text-4xl md:text-5xl lg:text-6xl">
           Bonitaa HQ - The Clinic That{" "}
           <span className="bg-gradient-to-r from-primary to-yellow-200 bg-clip-text text-transparent">
             Understands Indian Skin Problems
           </span>
         </h1>
 
-        <p className="mb-10 max-sm:mb-4 max-w-xl text-pretty text-lg text-muted-foreground md:text-xl">
+        <p className="mb-6 max-w-md text-pretty text-base leading-7 text-muted-foreground sm:mb-10 sm:max-w-xl sm:text-lg md:text-xl">
           Advanced skin analysis, expert-guided treatments, and personalised solutions designed for Indian skin. Trusted by thousands across Tamil Nadu.
         </p>
 
-        <div className="flex items-center gap-4 sm:flex-row">
+        <div className="flex w-full max-w-sm flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4">
           <Button
             onClick={() => setShowForm(true)}
             size="lg"
-            className="group relative flex items-center gap-3 bg-primary px-8 py-7 text-lg font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_40px_rgba(221,185,90,0.5)]"
+            className="group relative flex w-full items-center justify-center gap-3 bg-primary px-6 py-5 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_40px_rgba(221,185,90,0.5)] sm:w-auto sm:px-8 sm:py-7 sm:text-lg"
           >
             <Scan className="h-5 w-5 transition-transform group-hover:scale-110" />
             Scan Scan Scan
@@ -91,9 +91,9 @@ export function SkinHeroSection({ onStartScan }: SkinHeroSectionProps) {
             type="button"
             size="lg"
             variant="outline"
-            className="group flex items-center gap-3 border-primary/40 bg-background/70 px-8 py-7 text-lg font-semibold text-foreground shadow-[0_12px_40px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all hover:border-primary hover:bg-primary/10 hover:text-primary hover:shadow-[0_0_30px_rgba(221,185,90,0.2)]"
+            className="group flex w-full items-center gap-3 border-primary/40 bg-background/70 px-6 py-5 text-base font-semibold text-foreground shadow-[0_12px_40px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all hover:border-primary hover:bg-primary/10 hover:text-primary hover:shadow-[0_0_30px_rgba(221,185,90,0.2)] sm:w-auto sm:px-8 sm:py-7 sm:text-lg"
           >
-            <a href="tel:9363707090">
+            <a href="tel:9363707090" className="flex w-full items-center justify-center gap-3">
               <Phone className="h-5 w-5 transition-transform group-hover:scale-110" />
               9363707090
             </a>
