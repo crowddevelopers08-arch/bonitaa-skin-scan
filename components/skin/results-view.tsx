@@ -72,38 +72,13 @@ const pdfByProblem: Record<SkinProblemKey, string> = {
   "open-pores": "/Open-Pores-Report.pdf",
 }
 
-const promoImagesByProblem: Partial<Record<SkinProblemKey, Array<{ src: string; alt: string }>>> = {
-  acne: [
-    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel treatment offer" },
-    { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser treatment offer" },
-  ],
-  pigmentation: [
-    { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser pigmentation treatment offer" },
-    { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser treatment offer" },
-    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel brightening treatment offer" },
-    { src: "/image.png", alt: "Bonitaa Laser Hair Removal offer" },
-    { src: "/image%20(2).png", alt: "Bonitaa Underarm Laser Hair Removal offer" },
-  ],
-  dullness: [
-    { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser glow treatment offer" },
-    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel brightening treatment offer" },
-  ],
-  tanning: [
-    { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser sun damage treatment offer" },
-    { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser skin restoration offer" },
-  ],
-  "uneven-skin-tone": [
-    { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser treatment offer" },
-    { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser pigmentation correction offer" },
-    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel and Q-Switch Laser offer" },
-    { src: "/image.png", alt: "Bonitaa Laser Hair Removal offer" },
-    { src: "/image%20(2).png", alt: "Bonitaa Underarm Laser Hair Removal offer" },
-  ],
-  "open-pores": [
-    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel resurfacing treatment offer" },
-    { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser rejuvenation offer" },
-  ],
-}
+const commonPromoImages = [
+  { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser pigmentation treatment offer" },
+  { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser treatment offer" },
+  { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel brightening treatment offer" },
+  { src: "/image.png", alt: "Bonitaa Laser Hair Removal offer" },
+  { src: "/image%20(2).png", alt: "Bonitaa Underarm Laser Hair Removal offer" },
+] as const
 
 async function downloadSkinGuide(pdfPath: string, fileName: string) {
   const response = await fetch(pdfPath)
@@ -133,7 +108,7 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
 
   const problem = (formData.problem || "acne") as SkinProblemKey
   const data = resultsData[problem]
-  const promoImages = promoImagesByProblem[problem] ?? []
+  const promoImages = commonPromoImages
 
   const handleDownload = () => {
     setPdfForm({
@@ -190,11 +165,13 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
         .pdf-dl-btn { display: flex; flex-shrink: 0; }
         .mobile-dl-btn { display: none; }
         .promo-strip {
-          display: grid;
+          display: flex;
           gap: 14px;
-          grid-template-columns: repeat(var(--promo-count), minmax(0, 1fr));
+          flex-wrap: nowrap;
+          align-items: stretch;
         }
         .promo-card {
+          flex: 1 1 0;
           min-width: 0;
           background: rgba(255,255,255,0.02);
           border: 1px solid rgba(221,185,90,0.12);
@@ -208,11 +185,13 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
         }
         @media (max-width: 900px) {
           .promo-strip {
-            grid-template-columns: repeat(var(--promo-count), minmax(180px, 1fr));
             overflow-x: auto;
             padding-bottom: 4px;
           }
-          .promo-card { min-width: 180px; }
+          .promo-card {
+            flex: 0 0 180px;
+            min-width: 180px;
+          }
         }
       `}</style>
       <div style={{ position: "fixed", inset: 0, background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(221,185,90,0.07), transparent)", pointerEvents: "none", zIndex: 0 }} />
