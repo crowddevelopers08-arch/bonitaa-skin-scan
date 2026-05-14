@@ -15,6 +15,14 @@ interface ResultsViewProps {
   onBack: () => void
 }
 
+const locationOptions = [
+  "Trichy",
+  "Coimbatore",
+  "Madurai",
+  "Chennai",
+  "Other location",
+]
+
 const resultsData = {
   "hair-fall": {
     title: "Hair Fall Report",
@@ -111,7 +119,11 @@ async function downloadFromPublic(pdfPath: string, fileName: string) {
 export function ResultsView({ formData, capturedImage, onBack }: ResultsViewProps) {
   const [pdfFormOpen, setPdfFormOpen] = useState(false)
   const [pdfGenerating, setPdfGenerating] = useState(false)
-  const [pdfForm, setPdfForm] = useState({ name: formData.name || "", phone: formData.phone || "" })
+  const [pdfForm, setPdfForm] = useState({
+    name: formData.name || "",
+    phone: formData.phone || "",
+    location: "Coimbatore",
+  })
 
   const problem = (formData.problem || "hair-fall") as keyof typeof resultsData
   const data = resultsData[problem]
@@ -119,13 +131,17 @@ export function ResultsView({ formData, capturedImage, onBack }: ResultsViewProp
   if (!data) return null
 
   const handleDownload = () => {
-    setPdfForm({ name: formData.name || "", phone: formData.phone || "" })
+    setPdfForm({
+      name: formData.name || "",
+      phone: formData.phone || "",
+      location: "Coimbatore",
+    })
     setPdfFormOpen(true)
   }
 
   const handlePdfFormSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!pdfForm.name.trim() || !pdfForm.phone.trim()) return
+    if (!pdfForm.name.trim() || !pdfForm.phone.trim() || !pdfForm.location.trim()) return
     setPdfGenerating(true)
     try {
       const saveRes = await fetch("/api/save-scan", {
@@ -136,6 +152,8 @@ export function ResultsView({ formData, capturedImage, onBack }: ResultsViewProp
           phone: pdfForm.phone,
           problem,
           imageData: capturedImage ?? "",
+          location: pdfForm.location,
+          pageUrl: window.location.href,
         }),
       })
       if (!saveRes.ok) {
@@ -355,9 +373,25 @@ export function ResultsView({ formData, capturedImage, onBack }: ResultsViewProp
                   className="border-border/50 bg-background/50 focus:border-primary focus:ring-primary"
                 />
               </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="pdf-location" className="text-foreground">Location</Label>
+                <select
+                  id="pdf-location"
+                  value={pdfForm.location}
+                  onChange={(e) => setPdfForm({ ...pdfForm, location: e.target.value })}
+                  className="h-10 w-full rounded-md border border-border/50 bg-background/50 px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-primary"
+                >
+                  <option value="">Select your location</option>
+                  {locationOptions.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Button
                 type="submit"
-                disabled={!pdfForm.name.trim() || !pdfForm.phone.trim()}
+                disabled={!pdfForm.name.trim() || !pdfForm.phone.trim() || !pdfForm.location.trim()}
                 className="mt-2 w-full bg-primary text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(221,185,90,0.4)] disabled:opacity-50"
               >
                 <Download className="mr-2 h-4 w-4" />

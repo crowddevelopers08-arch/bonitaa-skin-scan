@@ -14,6 +14,14 @@ interface SkinResultsViewProps {
   onBack: () => void
 }
 
+const locationOptions = [
+  "Trichy",
+  "Coimbatore",
+  "Madurai",
+  "Chennai",
+  "Other location",
+]
+
 const resultsData = {
   acne: {
     title: "Acne Skin Report",
@@ -84,19 +92,27 @@ async function downloadSkinGuide(pdfPath: string, fileName: string) {
 export function SkinResultsView({ formData, capturedImage, onBack }: SkinResultsViewProps) {
   const [pdfFormOpen, setPdfFormOpen] = useState(false)
   const [pdfGenerating, setPdfGenerating] = useState(false)
-  const [pdfForm, setPdfForm] = useState({ name: formData.name || "", phone: formData.phone || "" })
+  const [pdfForm, setPdfForm] = useState({
+    name: formData.name || "",
+    phone: formData.phone || "",
+    location: "Coimbatore",
+  })
 
   const problem = (formData.problem || "acne") as SkinProblemKey
   const data = resultsData[problem]
 
   const handleDownload = () => {
-    setPdfForm({ name: formData.name || "", phone: formData.phone || "" })
+    setPdfForm({
+      name: formData.name || "",
+      phone: formData.phone || "",
+      location: "Coimbatore",
+    })
     setPdfFormOpen(true)
   }
 
   const handlePdfFormSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!pdfForm.name.trim() || !pdfForm.phone.trim()) return
+    if (!pdfForm.name.trim() || !pdfForm.phone.trim() || !pdfForm.location.trim()) return
 
     setPdfGenerating(true)
     try {
@@ -108,6 +124,8 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
           phone: pdfForm.phone,
           problem,
           imageData: capturedImage ?? "",
+          location: pdfForm.location,
+          pageUrl: window.location.href,
         }),
       })
 
@@ -232,7 +250,23 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
                 <Label htmlFor="skin-pdf-phone" className="text-foreground">Phone Number</Label>
                 <Input id="skin-pdf-phone" type="tel" placeholder="Enter your phone number" value={pdfForm.phone} onChange={(e) => setPdfForm({ ...pdfForm, phone: e.target.value })} className="border-border/50 bg-background/50 focus:border-primary focus:ring-primary" />
               </div>
-              <Button type="submit" disabled={!pdfForm.name.trim() || !pdfForm.phone.trim()} className="mt-2 w-full bg-primary text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(221,185,90,0.4)] disabled:opacity-50">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="skin-pdf-location" className="text-foreground">Location</Label>
+                <select
+                  id="skin-pdf-location"
+                  value={pdfForm.location}
+                  onChange={(e) => setPdfForm({ ...pdfForm, location: e.target.value })}
+                  className="h-10 w-full rounded-md border border-border/50 bg-background/50 px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-primary"
+                >
+                  <option value="">Select your location</option>
+                  {locationOptions.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button type="submit" disabled={!pdfForm.name.trim() || !pdfForm.phone.trim() || !pdfForm.location.trim()} className="mt-2 w-full bg-primary text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(221,185,90,0.4)] disabled:opacity-50">
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
               </Button>

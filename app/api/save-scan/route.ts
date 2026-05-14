@@ -10,9 +10,15 @@ function normalizePhone(phone: string) {
 async function syncLeadToTelecrm({
   name,
   phone,
+  location,
+  problem,
+  pageUrl,
 }: {
   name: string
   phone: string
+  location: string
+  problem: string
+  pageUrl: string
 }) {
   const apiUrl = process.env.TELECRM_API_URL
   const apiKey = process.env.TELECRM_API_KEY
@@ -25,33 +31,113 @@ async function syncLeadToTelecrm({
     fields: {
       phone,
       name,
+      location,
+      problem,
+      form_name: "skin website leads",
+      source: "skin website leads",
+      lead_source: "skin website leads",
+      website_url: pageUrl,
+      page_url: pageUrl,
+      live_url: pageUrl,
     },
   }
 
-  const response = await fetch(apiUrl, {
+  const primaryResult = await readTelecrmResponse(
+    await sendTelecrmRequest(apiUrl, apiKey, payload),
+  )
+
+  if (primaryResult.ok) {
+    return primaryResult.data
+  }
+
+  if (
+    primaryResult.status === 403 &&
+    primaryResult.rawText.includes("SECRET_KEY_MISSING") &&
+    apiUrl.includes("/v2/enterprise/")
+  ) {
+    const fallbackUrl = buildLegacyTelecrmUrl(apiUrl)
+
+    if (fallbackUrl) {
+      const fallbackResult = await readTelecrmResponse(
+        await sendTelecrmRequest(fallbackUrl, apiKey, payload),
+      )
+
+      if (fallbackResult.ok) {
+        return fallbackResult.data
+      }
+
+      throw new Error(
+        `TeleCRM request failed with ${fallbackResult.status}${
+          fallbackResult.rawText ? `: ${fallbackResult.rawText}` : ""
+        }`,
+      )
+    }
+  }
+
+  throw new Error(
+    `TeleCRM request failed with ${primaryResult.status}${
+      primaryResult.rawText ? `: ${primaryResult.rawText}` : ""
+    }`,
+  )
+}
+
+function buildLegacyTelecrmUrl(apiUrl: string) {
+  const match = apiUrl.match(/\/v2\/enterprise\/([^/]+)\/autoupdatelead$/)
+
+  if (!match) {
+    return null
+  }
+
+  const enterpriseId = match[1]
+  return `https://next.telecrm.in/autoupdate/enterprise/${enterpriseId}/autoupdatelead`
+}
+
+async function sendTelecrmRequest(
+  url: string,
+  apiKey: string,
+  payload: {
+    fields: {
+      phone: string
+      name: string
+      location: string
+      problem: string
+      form_name: string
+      source: string
+      lead_source: string
+      website_url: string
+      page_url: string
+      live_url: string
+    }
+  },
+) {
+  return fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: apiKey,
-      "X-API-Key": apiKey,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(payload),
     cache: "no-store",
   })
+}
 
-  const text = await response.text()
+async function readTelecrmResponse(response: Response) {
+  const rawText = await response.text()
   let data: unknown = null
 
   try {
-    data = text ? JSON.parse(text) : null
+    data = rawText ? JSON.parse(rawText) : null
   } catch {
-    data = text
+    data = rawText
   }
 
   if (!response.ok) {
-    throw new Error(
-      `TeleCRM request failed with ${response.status}${text ? `: ${text}` : ""}`,
-    )
+    return {
+      ok: false as const,
+      status: response.status,
+      rawText,
+      data,
+    }
   }
 
   if (
@@ -68,12 +154,17 @@ async function syncLeadToTelecrm({
     throw new Error(`TeleCRM error: ${errorString}`)
   }
 
-  return data
+  return {
+    ok: true as const,
+    status: response.status,
+    rawText,
+    data,
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, phone, problem, imageData } = await req.json()
+    const { name, phone, problem, imageData, location, pageUrl } = await req.json()
 
     if (!name || !phone || !problem || !imageData) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -85,14 +176,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid phone number" }, { status: 400 })
     }
 
+    if (!location || typeof location !== "string" || !location.trim()) {
+      return NextResponse.json({ error: "Location is required" }, { status: 400 })
+    }
+
+    const normalizedLocation = location.trim()
+
     const scan = await prisma.scan.create({
-      data: { name, phone: normalizedPhone, problem, imageData },
+      data: { name, phone: normalizedPhone, location: normalizedLocation, problem, imageData },
     })
 
     try {
       await syncLeadToTelecrm({
         name: name.trim(),
         phone: normalizedPhone,
+        location: normalizedLocation,
+        problem,
+        pageUrl:
+          typeof pageUrl === "string" && pageUrl.trim()
+            ? pageUrl.trim()
+            : "https://hairscan.bonitaa.co.in/",
       })
     } catch (telecrmError) {
       console.error("TeleCRM sync failed:", telecrmError)

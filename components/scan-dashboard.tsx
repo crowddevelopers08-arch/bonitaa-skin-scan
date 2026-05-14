@@ -32,6 +32,13 @@ const skinProblems = [
 ]
 
 const allProblems = [...skinProblems]
+const locationOptions = [
+  "Trichy",
+  "Coimbatore",
+  "Madurai",
+  "Chennai",
+  "Other location",
+]
 
 type DashboardSearchParams = Promise<{
   q?: string
@@ -107,8 +114,8 @@ export async function ScanDashboard({
       scan.name.toLowerCase().includes(query) ||
       scan.phone.toLowerCase().includes(query)
 
-    // Location is accepted in the API shape, but ignored until the model stores it.
-    const matchesLocation = !selectedLocation
+    const matchesLocation =
+      !selectedLocation || scan.location.toLowerCase().includes(selectedLocation)
     const matchesProblem = !selectedProblem || scan.problem === selectedProblem
     const matchesDate = matchesDateRange(
       scan.createdAt,
@@ -162,6 +169,7 @@ export async function ScanDashboard({
                   <p className="text-xs text-muted-foreground">#{scan.id}</p>
                 </div>
                 <p className="text-sm text-muted-foreground">{scan.phone}</p>
+                <p className="text-sm text-muted-foreground">{scan.location}</p>
                 <p className="text-xs text-muted-foreground">
                   {new Date(scan.createdAt).toLocaleString()}
                 </p>
@@ -230,13 +238,19 @@ export async function ScanDashboard({
             >
               Location
             </label>
-            <input
+            <select
               id="dashboard-location"
               name="location"
               defaultValue={resolvedSearchParams.location ?? ""}
-              placeholder="All locations"
               className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none transition focus:border-primary"
-            />
+            >
+              <option value="">All locations</option>
+              {locationOptions.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
