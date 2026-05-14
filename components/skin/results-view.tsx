@@ -121,8 +121,8 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
       window.location.assign("/thank-you")
     } catch (err) {
       console.error("Submit/download failed:", err)
-      if (err instanceof Error && err.message.includes("Failed to save scan")) {
-        alert(`Database save failed: ${err.message}`)
+      if (err instanceof Error) {
+        alert(err.message)
       } else {
         alert("Unable to download the PDF right now.")
       }

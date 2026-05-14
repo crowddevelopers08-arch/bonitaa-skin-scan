@@ -149,10 +149,9 @@ export function ResultsView({ formData, capturedImage, onBack }: ResultsViewProp
       window.location.assign("/thank-you")
     } catch (err) {
       console.error("Submit/download failed:", err)
-      if (err instanceof Error && err.message.includes("Failed to save scan")) {
-        alert(`Database save failed: ${err.message}`)
-      }
       if (err instanceof Error && err.message.includes("PDF not found")) {
+        alert(err.message)
+      } else if (err instanceof Error) {
         alert(err.message)
       }
     } finally {
