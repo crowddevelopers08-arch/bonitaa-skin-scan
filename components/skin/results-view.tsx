@@ -80,6 +80,9 @@ const promoImagesByProblem: Partial<Record<SkinProblemKey, Array<{ src: string; 
   pigmentation: [
     { src: "/image%20(4).png", alt: "Bonitaa Q-Switch Laser pigmentation treatment offer" },
     { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser treatment offer" },
+    { src: "/image%20(5).png", alt: "Bonitaa Pumpkin Peel brightening treatment offer" },
+    { src: "/image.png", alt: "Bonitaa Laser Hair Removal offer" },
+    { src: "/image%20(2).png", alt: "Bonitaa Underarm Laser Hair Removal offer" },
   ],
   dullness: [
     { src: "/image%20(3).png", alt: "Bonitaa PDNR and Q-Switch Laser glow treatment offer" },
@@ -186,10 +189,30 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
         .pdf-card-inner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
         .pdf-dl-btn { display: flex; flex-shrink: 0; }
         .mobile-dl-btn { display: none; }
+        .promo-strip {
+          display: grid;
+          gap: 14px;
+          grid-template-columns: repeat(var(--promo-count), minmax(0, 1fr));
+        }
+        .promo-card {
+          min-width: 0;
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(221,185,90,0.12);
+          border-radius: 18px;
+          overflow: hidden;
+        }
         @media (max-width: 480px) {
           .pdf-card-inner { flex-direction: column; align-items: stretch; }
           .pdf-dl-btn { display: none; }
           .mobile-dl-btn { display: flex; }
+        }
+        @media (max-width: 900px) {
+          .promo-strip {
+            grid-template-columns: repeat(var(--promo-count), minmax(180px, 1fr));
+            overflow-x: auto;
+            padding-bottom: 4px;
+          }
+          .promo-card { min-width: 180px; }
         }
       `}</style>
       <div style={{ position: "fixed", inset: 0, background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(221,185,90,0.07), transparent)", pointerEvents: "none", zIndex: 0 }} />
@@ -200,7 +223,7 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
           Back to Home
         </button>
 
-        <div style={{ maxWidth: "720px", margin: "0 auto" }}>
+        <div style={{ maxWidth: promoImages.length >= 5 ? "1180px" : "720px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "36px" }}>
             <div style={{ width: 64, height: 64, borderRadius: "50%", margin: "0 auto 16px", border: "1px solid rgba(221,185,90,0.4)", background: "rgba(221,185,90,0.1)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 30px rgba(221,185,90,0.2)" }}>
               <CheckCircle2 style={{ width: 30, height: 30, color: "#ddb95a" }} />
@@ -252,25 +275,11 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
               </div>
 
               <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(${promoImages.length}, minmax(180px, 1fr))`,
-                  gap: "14px",
-                  overflowX: "auto",
-                  paddingBottom: "4px",
-                }}
+                className="promo-strip"
+                style={{ ["--promo-count" as string]: promoImages.length }}
               >
                 {promoImages.map((image) => (
-                  <div
-                    key={image.src}
-                    style={{
-                      minWidth: "180px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid rgba(221,185,90,0.12)",
-                      borderRadius: "18px",
-                      overflow: "hidden",
-                    }}
-                  >
+                  <div key={`${image.src}-${image.alt}`} className="promo-card">
                     <img
                       src={image.src}
                       alt={image.alt}
