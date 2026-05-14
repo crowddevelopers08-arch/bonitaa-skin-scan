@@ -24,8 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
-        <Script id="meta-pixel-base" strategy="afterInteractive">
+      <head>
+        {/* Meta Pixel Code */}
+        <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -40,14 +41,17 @@ export default function RootLayout({
           `}
         </Script>
         <noscript>
-          <img
-            height="1"
-            width="1"
+          <img 
+            height="1" 
+            width="1" 
             style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=1515469256867895&ev=PageView&noscript=1"
             alt=""
           />
         </noscript>
+        {/* End Meta Pixel Code */}
+      </head>
+      <body className="font-sans antialiased">
         {children}
         <Analytics />
       </body>
