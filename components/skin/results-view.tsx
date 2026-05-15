@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -100,6 +100,7 @@ async function downloadSkinGuide(pdfPath: string, fileName: string) {
 export function SkinResultsView({ formData, capturedImage, onBack }: SkinResultsViewProps) {
   const [pdfFormOpen, setPdfFormOpen] = useState(false)
   const [pdfGenerating, setPdfGenerating] = useState(false)
+  const promoStripRef = useRef<HTMLDivElement | null>(null)
   const [pdfForm, setPdfForm] = useState({
     name: formData.name || "",
     phone: formData.phone || "",
@@ -109,6 +110,30 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
   const problem = (formData.problem || "acne") as SkinProblemKey
   const data = resultsData[problem]
   const promoImages = commonPromoImages
+
+  useEffect(() => {
+    const strip = promoStripRef.current
+    if (!strip || promoImages.length < 2) return
+
+    let currentIndex = 0
+
+    const autoScroll = () => {
+      if (window.innerWidth > 480) return
+
+      const cards = strip.querySelectorAll<HTMLElement>(".promo-card")
+      if (!cards.length) return
+
+      currentIndex = (currentIndex + 1) % cards.length
+      strip.scrollTo({
+        left: cards[currentIndex].offsetLeft,
+        behavior: "smooth",
+      })
+    }
+
+    const intervalId = window.setInterval(autoScroll, 2500)
+
+    return () => window.clearInterval(intervalId)
+  }, [promoImages.length])
 
   const handleDownload = () => {
     setPdfForm({
@@ -178,11 +203,6 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
           border-radius: 18px;
           overflow: hidden;
         }
-        @media (max-width: 480px) {
-          .pdf-card-inner { flex-direction: column; align-items: stretch; }
-          .pdf-dl-btn { display: none; }
-          .mobile-dl-btn { display: flex; }
-        }
         @media (max-width: 900px) {
           .promo-strip {
             overflow-x: auto;
@@ -191,6 +211,20 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
           .promo-card {
             flex: 0 0 180px;
             min-width: 180px;
+          }
+        }
+        @media (max-width: 480px) {
+          .pdf-card-inner { flex-direction: column; align-items: stretch; }
+          .pdf-dl-btn { display: none; }
+          .mobile-dl-btn { display: flex; }
+          .promo-strip {
+            gap: 12px;
+            scroll-snap-type: x mandatory;
+          }
+          .promo-card {
+            flex: 0 0 calc(100vw - 68px);
+            min-width: calc(100vw - 68px);
+            scroll-snap-align: start;
           }
         }
       `}</style>
@@ -240,7 +274,7 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
                 background: "linear-gradient(145deg, #0e1118, #0a0d15)",
                 border: "1px solid rgba(221,185,90,0.15)",
                 borderRadius: "18px",
-                padding: "22px",
+                padding: "clamp(18px, 4vw, 22px)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}
             >
@@ -254,6 +288,7 @@ export function SkinResultsView({ formData, capturedImage, onBack }: SkinResults
               </div>
 
               <div
+                ref={promoStripRef}
                 className="promo-strip"
                 style={{ ["--promo-count" as string]: promoImages.length }}
               >

@@ -181,6 +181,21 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedLocation = location.trim()
+    const existingScan = await prisma.scan.findFirst({
+      where: { phone: normalizedPhone },
+      select: { id: true, createdAt: true },
+    })
+
+    if (existingScan) {
+      return NextResponse.json(
+        {
+          error: "This phone number has already been used to submit the form.",
+          duplicate: true,
+          id: existingScan.id,
+        },
+        { status: 409 },
+      )
+    }
 
     const scan = await prisma.scan.create({
       data: { name, phone: normalizedPhone, location: normalizedLocation, problem, imageData },
